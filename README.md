@@ -104,7 +104,6 @@ The models were trained on the Brain Tumor MRI Dataset from Kaggle.
 ## Author
 
 Younas — Software Engineering student, University of Malakand
-Final Year Project, supervised by Dr. Muhammad Faisal
 
 ## License
 

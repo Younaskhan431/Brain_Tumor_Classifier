@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuro-Imaging Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="shell">
+        <div class="card">
+            <p class="eyebrow">Neuro-Imaging Analysis</p>
+            <h1>Brain Tumor MRI Classifier</h1>
+            <p class="subtitle">Upload a T1/T2-weighted MRI slice. The model scores it against four classes and returns the most likely diagnosis with a confidence estimate.</p>
+
+            {% if error %}
+                <div class="error-banner">{{ error }}</div>
+            {% endif %}
+
+            <div class="layout">
+                <form action="/predict" method="post" enctype="multipart/form-data" id="predict-form">
+                    <label class="dropzone" id="dropzone">
+                        <input type="file" name="file" id="file-input" accept="image/*" required>
+                        <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 16V4M12 4L7 9M12 4l5 5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="dropzone-title">Drop MRI scan or click to browse</span>
+                        <span class="dropzone-hint">JPG, PNG · single slice</span>
+
+                        <div class="preview-wrap" id="preview-wrap">
+                            <img id="preview-img" src="" alt="Selected scan preview">
+                            <div class="scan-line"></div>
+                        </div>
+                    </label>
+                    <button type="submit" class="btn" id="submit-btn">Run Analysis</button>
+                </form>
+
+                <div class="legend">
+                    <p class="legend-title">Detectable classes</p>
+                    <div class="legend-item"><span class="dot glioma"></span> Glioma</div>
+                    <div class="legend-item"><span class="dot meningioma"></span> Meningioma</div>
+                    <div class="legend-item"><span class="dot pituitary"></span> Pituitary tumor</div>
+                    <div class="legend-item"><span class="dot notumor"></span> No tumor detected</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay">
+        <div class="overlay-bar"></div>
+        <p class="overlay-text">Analyzing scan…</p>
+    </div>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const previewWrap = document.getElementById('preview-wrap');
+        const previewImg = document.getElementById('preview-img');
+        const form = document.getElementById('predict-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const overlay = document.getElementById('overlay');
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                previewWrap.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        ['dragenter', 'dragover'].forEach(evt =>
+            dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); })
+        );
+        ['dragleave', 'drop'].forEach(evt =>
+            dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); })
+        );
+        dropzone.addEventListener('drop', (e) => {
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        form.addEventListener('submit', () => {
+            if (fileInput.files.length === 0) return;
+            submitBtn.disabled = true;
+            overlay.classList.add('active');
+        });
+    </script>
+</body>
+</html>

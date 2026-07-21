@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Result</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-class="{{ primary.prediction }}">
+    <div class="shell">
+        <div class="card">
+            <p class="eyebrow">Analysis Complete</p>
+            <h1>Result</h1>
+
+            <div class="result-layout">
+                <div class="result-image">
+                    <img src="{{ image_path }}" alt="Analyzed MRI scan">
+                </div>
+
+                <div class="result-panel">
+                    <p class="result-label">Predicted class · {{ primary.label }} (best model)</p>
+                    <p class="result-class">{{ primary.prediction }}</p>
+
+                    <div class="gauge-row">
+                        <div class="gauge" style="--confidence: {{ primary.confidence }};">
+                            <div class="gauge-value">{{ primary.confidence }}%</div>
+                        </div>
+                        <p class="gauge-caption">Confidence from {{ primary.label }}</p>
+                    </div>
+
+                    <a href="/" class="btn-link">Analyze another scan</a>
+                </div>
+            </div>
+
+            <div class="compare">
+                <p class="compare-title">Other models</p>
+                {% for m in others %}
+                <div class="compare-row">
+                    <span class="compare-model">{{ m.label }}</span>
+                    <span class="compare-class">{{ m.prediction }}</span>
+                    <span class="compare-confidence">{{ m.confidence }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
